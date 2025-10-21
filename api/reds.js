@@ -21,12 +21,18 @@ async function sendTelegramLog(request) {
     };
     
     const flag = data.emoji_flag || getFlagEmoji(data.country_code);
-    const message = `${flag} New Visit [Redirect]:\nIP: ${data.ip}\nLocation: ${data.country_name}, ${data.region}, ${data.city}\nProvider: ${data.asn.name}\nThreat: Proxy: ${data.threat.is_proxy}, Tor: ${data.threat.is_tor}\nUser-Agent: ${userAgent}`;
+    const message = `${flag} New Visit [Edge]:\nIP: ${data.ip}\nLocation: ${data.country_name}, ${data.region}, ${data.city}\nProvider: ${data.asn.name}\nThreat: Proxy: ${data.threat.is_proxy}, Tor: ${data.threat.is_tor}\nUser-Agent: ${userAgent}`;
 
     const telegramUrl = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(message)}`;
 
-    await fetch(telegramUrl);
-
+    const telegramResponse = await fetch(telegramUrl);
+    
+    if (!telegramResponse.ok) {
+        const errorData = await telegramResponse.json();
+        console.error("Telegram API Error:", errorData);
+    } else {
+        console.log("Telegram log sent successfully in background.");
+    }
   } catch (error) {
     console.error("Background tracking task failed:", error);
   }
@@ -37,10 +43,11 @@ export default function handler(request, event) {
 
   event.waitUntil(sendTelegramLog(request));
 
-  return new Response(null, {
-    status: 307,
+  return new Response(JSON.stringify({ redirectTo: REDIRECT_URL }), {
+    status: 200,
     headers: {
-      'Location': REDIRECT_URL,
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*',
     },
   });
 }
