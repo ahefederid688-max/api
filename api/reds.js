@@ -9,10 +9,12 @@ export default function handler(request) {
     return new Response('Redirect URL not configured.', { status: 500 });
   }
 
-  return new Response(null, {
-    status: 307,
+  const html = `<!DOCTYPE html><html><head><script>window.location.replace("${REDIRECT_URL}");</script></head><body></body></html>`;
+
+  return new Response(html, {
+    status: 200,
     headers: {
-      'Location': REDIRECT_URL,
+      'Content-Type': 'text/html',
     },
   });
 }
