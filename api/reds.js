@@ -5,16 +5,12 @@ export const config = {
 export default function handler(request) {
   const REDIRECT_URL = process.env.REDIRECT_URL;
 
-  if (!REDIRECT_URL) {
-    return new Response('Redirect URL not configured.', { status: 500 });
-  }
 
-  const html = `<!DOCTYPE html><html><head><script>window.location.replace("${REDIRECT_URL}");</script></head><body></body></html>`;
-
-  return new Response(html, {
+  return new Response(JSON.stringify({ redirectTo: REDIRECT_URL }), {
     status: 200,
     headers: {
-      'Content-Type': 'text/html',
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*',
     },
   });
 }
